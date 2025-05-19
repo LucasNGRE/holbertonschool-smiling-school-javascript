@@ -138,108 +138,72 @@
     <main class="main">
       <section class="quotes section d-flex align-items-center">
         <div class="container">
-          <div
-            id="carouselExampleControls"
-            class="carousel slide"
-            data-ride="carousel"
-          >
-            <div class="carousel-inner">
-              <div class="carousel-item active">
-                <div class="row mx-auto align-items-center">
-                  <div class="col-12 col-sm-2 col-lg-2 offset-lg-1 text-center">
-                    <img
-                      src="images/profile_5.jpg"
-                      class="d-block align-self-center"
-                      alt="Carousel Pic 1"
-                    />
-                  </div>
-                  <div class="col-12 col-sm-7 offset-sm-2 col-lg-9 offset-lg-0">
-                    <div class="quote-text">
-                      <p class="text-white">
-                        « Those tutorials are concise and go straight to the
-                        point. I can’t think of a better place to learn smiling.
-                        And it’s so fun!
-                      </p>
-                      <h4 class="text-white font-weight-bold">Person Name</h4>
-                      <span class="text-white">weather presenter</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="carousel-item">
-                <div class="row mx-auto align-items-center">
-                  <div class="col-12 col-sm-2 col-lg-2 offset-lg-1 text-center">
-                    <img
-                      src="images/profile_5.jpg"
-                      class="d-block align-self-center"
-                      alt="Carousel Pic 1"
-                    />
-                  </div>
-                  <div class="col-12 col-sm-7 offset-sm-2 col-lg-9 offset-lg-0">
-                    <div class="quote-text">
-                      <p class="text-white">
-                        « Those tutorials are concise and go straight to the
-                        point. I can’t think of a better place to learn smiling.
-                        And it’s so fun!
-                      </p>
-                      <h4 class="text-white font-weight-bold">Person Name</h4>
-                      <span class="text-white">weather presenter</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="carousel-item">
-                <div class="row mx-auto align-items-center">
-                  <div class="col-12 col-sm-2 col-lg-2 offset-lg-1 text-center">
-                    <img
-                      src="images/profile_5.jpg"
-                      class="d-block align-self-center"
-                      alt="Carousel Pic 1"
-                    />
-                  </div>
-                  <div class="col-12 col-sm-7 offset-sm-2 col-lg-9 offset-lg-0">
-                    <div class="quote-text">
-                      <p class="text-white">
-                        « Those tutorials are concise and go straight to the
-                        point. I can’t think of a better place to learn smiling.
-                        And it’s so fun!
-                      </p>
-                      <h4 class="text-white font-weight-bold">Person Name</h4>
-                      <span class="text-white">weather presenter</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <a
-              class="carousel-control-prev arrow-left"
-              href="#carouselExampleControls"
-              role="button"
-              data-slide="prev"
-            >
-              <img
-                src="images/arrow_white_left.png"
-                alt="Quote Previous"
-                aria-hidden="true"
-              />
-              <span class="sr-only">Previous</span>
-            </a>
-            <a
-              class="carousel-control-next arrow-right"
-              href="#carouselExampleControls"
-              role="button"
-              data-slide="next"
-            >
-              <img
-                src="images/arrow_white_right.png"
-                alt="Quote Next"
-                aria-hidden="true"
-              />
-              <span class="sr-only">Next</span>
-            </a>
+           <!-- Loader -->
+          <div class="loader mx-auto my-5"></div>
+          <div id="quotes-carousel" style="display: none;"></div>
           </div>
-        </div>
       </section>
     </main>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        $.ajax({
+          url: 'https://smileschool-api.hbtn.info/quotes',
+          method: 'GET',
+          beforeSend: function () {
+            $('.loader').show();
+          },
+          success: function (data) {
+            if (data && data.length > 0) {
+              const carouselInner = $('<div class="carousel-inner"></div>');
+
+              data.forEach((quote, index) => {
+                const activeClass = index === 0 ? ' active' : '';
+                const item = `
+                  <div class="carousel-item${activeClass}">
+                    <div class="row mx-auto align-items-center">
+                      <div class="col-12 col-sm-2 col-lg-2 offset-lg-1 text-center">
+                        <img src="${quote.pic_url}" class="d-block align-self-center" alt="Quote image">
+                      </div>
+                      <div class="col-12 col-sm-7 offset-sm-2 col-lg-9 offset-lg-0">
+                        <div class="quote-text">
+                          <p class="text-white">« ${quote.text} »</p>
+                          <h4 class="text-white font-weight-bold">${quote.name}</h4>
+                          <span class="text-white">${quote.title}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                `;
+                carouselInner.append(item);
+              });
+
+              const carousel = `
+                <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+                  ${carouselInner.prop('outerHTML')}
+                  <a class="carousel-control-prev arrow-left" href="#carouselExampleControls" role="button" data-slide="prev">
+                    <img src="images/arrow_white_left.png" alt="Quote Previous" aria-hidden="true">
+                    <span class="sr-only">Previous</span>
+                  </a>
+                  <a class="carousel-control-next arrow-right" href="#carouselExampleControls" role="button" data-slide="next">
+                    <img src="images/arrow_white_right.png" alt="Quote Next" aria-hidden="true">
+                    <span class="sr-only">Next</span>
+                  </a>
+                </div>
+              `;
+
+              $('#quotes-carousel').html(carousel).show();
+            }
+          },
+          error: function () {
+            $('#quotes-carousel').html('<p class="text-white text-center">Erreur de chargement des citations.</p>').show();
+          },
+          complete: function () {
+            $('.loader').hide();
+          }
+        });
+      });
+    </script>
+
   </body>
 </html>
